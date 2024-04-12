@@ -15,12 +15,15 @@ from .run_token_classification import RunAutoTrainTokenClassificationCommand
 
 
 def main():
+    breakpoint()
     parser = argparse.ArgumentParser(
         "AutoTrain advanced CLI",
         usage="autotrain <command> [<args>]",
         epilog="For more information about a command, run: `autotrain <command> --help`",
     )
-    parser.add_argument("--version", "-v", help="Display AutoTrain version", action="store_true")
+    parser.add_argument(
+        "--version", "-v", help="Display AutoTrain version", action="store_true"
+    )
     commands_parser = parser.add_subparsers(help="commands")
 
     # Register commands
