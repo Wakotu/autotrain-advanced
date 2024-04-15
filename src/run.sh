@@ -33,9 +33,10 @@ LORA_DROPOUT=0.045
 	--lora-alpha ${LORA_ALPHA} \
 	--lora-dropout ${LORA_DROPOUT} \
 	--weight-decay ${WEIGHT_DECAY} \
-	--gradient-accumulation ${GRADIENT_ACCUMULATION} \
-	--mp fp16 \
-	$([[ "$USE_PEFT" == "True" ]] && echo "--use-peft") \
+	--gradient-accumulation ${GRADIENT_ACCUMULATION}
+# --mp fp16 \
+#
+$([[ "$USE_PEFT" == "True" ]] && echo "--use-peft") \
 	--quantization int4 \
 	--backend local-cli \
 	--username Wakotu
