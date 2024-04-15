@@ -17,7 +17,7 @@ LORA_R=16
 LORA_ALPHA=32
 LORA_DROPOUT=0.045
 
-/home/mity/.conda/envs/autotrain/bin/python main.py llm \
+~/.conda/envs/autotrain/bin/python main.py llm \
 	--train \
 	--trainer $TRAINER \
 	--model ${MODEL_NAME} \
