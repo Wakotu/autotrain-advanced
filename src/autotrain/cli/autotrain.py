@@ -15,7 +15,7 @@ from .run_token_classification import RunAutoTrainTokenClassificationCommand
 
 
 def main():
-    breakpoint()
+    # breakpoint()
     parser = argparse.ArgumentParser(
         "AutoTrain advanced CLI",
         usage="autotrain <command> [<args>]",

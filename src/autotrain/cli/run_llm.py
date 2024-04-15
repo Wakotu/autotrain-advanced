@@ -271,6 +271,7 @@ class RunAutoTrainLLMCommand(BaseAutoTrainCommand):
                 )
         run_llm_parser.set_defaults(func=run_llm_command_factory)
 
+    # `args`: argument list from command line or the parsers defiend above
     def __init__(self, args):
         self.args = args
 
@@ -308,15 +309,21 @@ class RunAutoTrainLLMCommand(BaseAutoTrainCommand):
             if self.args.push_to_hub:
                 # must have project_name, username and token OR project_name, repo_id, token
                 if self.args.username is None and self.args.repo_id is None:
-                    raise ValueError("Username or repo id must be specified for push to hub")
+                    raise ValueError(
+                        "Username or repo id must be specified for push to hub"
+                    )
                 if self.args.token is None:
                     raise ValueError("Token must be specified for push to hub")
 
-            if self.args.backend.startswith("spaces") or self.args.backend.startswith("ep-"):
+            if self.args.backend.startswith("spaces") or self.args.backend.startswith(
+                "ep-"
+            ):
                 if not self.args.push_to_hub:
                     raise ValueError("Push to hub must be specified for spaces backend")
                 if self.args.username is None and self.args.repo_id is None:
-                    raise ValueError("Repo id or username must be specified for spaces backend")
+                    raise ValueError(
+                        "Repo id or username must be specified for spaces backend"
+                    )
                 if self.args.token is None:
                     raise ValueError("Token must be specified for spaces backend")
 
@@ -328,7 +335,9 @@ class RunAutoTrainLLMCommand(BaseAutoTrainCommand):
     def run(self):
         logger.info("Running LLM")
         if self.args.train:
+            # construct command line arguments
             params = LLMTrainingParams(**vars(self.args))
+            # expand some intermediate arg to get the true params dict
             params = llm_munge_data(params, local=self.args.backend.startswith("local"))
             project = AutoTrainProject(params=params, backend=self.args.backend)
             _ = project.create()

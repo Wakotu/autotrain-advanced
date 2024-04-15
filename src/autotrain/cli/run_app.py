@@ -67,6 +67,7 @@ class RunAutoTrainAppCommand(BaseAutoTrainCommand):
         self.share = share
         self.workers = workers
 
+    # the ultimate run logic
     def run(self):
         from pyngrok import ngrok
 
@@ -92,6 +93,7 @@ class RunAutoTrainAppCommand(BaseAutoTrainCommand):
         with open("autotrain.log", "w", encoding="utf-8") as log_file:
             process = subprocess.Popen(
                 command,
+                # constants of subprocess is not an actual value(for file descriptor), it's an option for corresponding behavior
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 shell=True,
@@ -100,7 +102,9 @@ class RunAutoTrainAppCommand(BaseAutoTrainCommand):
                 preexec_fn=os.setsid,
             )
 
-            output_thread = threading.Thread(target=handle_output, args=(process.stdout, log_file))
+            output_thread = threading.Thread(
+                target=handle_output, args=(process.stdout, log_file)
+            )
             output_thread.start()
 
             try:

@@ -65,6 +65,7 @@ class AutoTrainProject:
         }
 
     def create_spaces(self):
+        # spaceRunner as the key component, params: params to specify running environment, backend: no idea
         sr = SpaceRunner(params=self.params, backend=self.spaces_backends[self.backend])
         space_id = sr.prepare()
         return space_id

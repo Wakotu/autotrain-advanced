@@ -80,7 +80,9 @@ def user_authentication(token):
     if token.startswith("hf_oauth"):
         user_info["id"] = resp["sub"]
         user_info["name"] = resp["preferred_username"]
-        user_info["orgs"] = [resp["orgs"][k]["preferred_username"] for k in range(len(resp["orgs"]))]
+        user_info["orgs"] = [
+            resp["orgs"][k]["preferred_username"] for k in range(len(resp["orgs"]))
+        ]
     else:
         user_info["id"] = resp["id"]
         user_info["name"] = resp["name"]
@@ -130,9 +132,12 @@ def run_training(params, task_id, local=False, wait=False):
     if not local:
         params.project_name = "/tmp/model"
     params.save(output_dir=params.project_name)
+    # construct running command
     cmd = launch_command(params=params)
     cmd = [str(c) for c in cmd]
     env = os.environ.copy()
+    # cmd : env, script, args
+    # breakpoint()
     process = subprocess.Popen(cmd, env=env)
     if wait:
         process.wait()

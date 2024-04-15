@@ -11,7 +11,12 @@ import requests
 from accelerate import PartialState
 from huggingface_hub import HfApi
 from pydantic import BaseModel
-from transformers import TrainerCallback, TrainerControl, TrainerState, TrainingArguments
+from transformers import (
+    TrainerCallback,
+    TrainerControl,
+    TrainerState,
+    TrainingArguments,
+)
 
 from autotrain import logger
 
@@ -93,7 +98,9 @@ def pause_space(params, is_failure=False):
                 if is_failure:
                     logger.info("Model failed to train and discussion was not created.")
                 else:
-                    logger.info("Model trained successfully but discussion was not created.")
+                    logger.info(
+                        "Model trained successfully but discussion was not created."
+                    )
 
         api.pause_space(repo_id=os.environ["SPACE_ID"])
     if "ENDPOINT_ID" in os.environ:
@@ -109,6 +116,7 @@ def monitor(func):
             config = args[0]
 
         try:
+            # breakpoint()
             return func(*args, **kwargs)
         except Exception as e:
             error_message = f"""{func.__name__} has failed due to an exception: {traceback.format_exc()}"""
@@ -154,7 +162,9 @@ class AutoTrainParams(BaseModel):
         if len(self.project_name) > 0 and self.project_name != "/tmp/model":
             # make sure project_name is always alphanumeric but can have hyphens. if not, raise ValueError
             if not self.project_name.replace("-", "").isalnum():
-                raise ValueError("project_name must be alphanumeric but can contain hyphens")
+                raise ValueError(
+                    "project_name must be alphanumeric but can contain hyphens"
+                )
 
         # project name cannot be more than 50 characters
         if len(self.project_name) > 50:
@@ -165,7 +175,9 @@ class AutoTrainParams(BaseModel):
         supplied = set(data.keys())
         not_supplied = defaults - supplied
         if not_supplied:
-            logger.warning(f"Parameters not supplied by user and set to default: {', '.join(not_supplied)}")
+            logger.warning(
+                f"Parameters not supplied by user and set to default: {', '.join(not_supplied)}"
+            )
 
         # Parameters that were supplied but not used
         # This is a naive implementation. It might catch some internal Pydantic params.
@@ -182,9 +194,17 @@ class UploadLogs(TrainerCallback):
         if self.config.push_to_hub:
             if PartialState().process_index == 0:
                 self.api = HfApi(token=config.token)
-                self.api.create_repo(repo_id=config.repo_id, repo_type="model", private=True)
+                self.api.create_repo(
+                    repo_id=config.repo_id, repo_type="model", private=True
+                )
 
-    def on_step_end(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
+    def on_step_end(
+        self,
+        args: TrainingArguments,
+        state: TrainerState,
+        control: TrainerControl,
+        **kwargs,
+    ):
 
         if self.config.push_to_hub is False:
             return control
@@ -192,7 +212,9 @@ class UploadLogs(TrainerCallback):
         if not os.path.exists(os.path.join(self.config.project_name, "runs")):
             return control
 
-        if (state.global_step + 1) % self.config.logging_steps == 0 and self.config.log == "tensorboard":
+        if (
+            state.global_step + 1
+        ) % self.config.logging_steps == 0 and self.config.log == "tensorboard":
             if PartialState().process_index == 0:
                 self.api.upload_folder(
                     folder_path=os.path.join(self.config.project_name, "runs"),

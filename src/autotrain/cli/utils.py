@@ -189,11 +189,17 @@ def tabular_munge_data(params, local):
         if len(col_map_label) == 1:
             params.target_columns = ["autotrain_label"]
         else:
-            params.target_columns = [f"autotrain_label_{i}" for i in range(len(col_map_label))]
+            params.target_columns = [
+                f"autotrain_label_{i}" for i in range(len(col_map_label))
+            ]
     return params
 
 
 def llm_munge_data(params, local):
+    """
+    the resulting params: training data preparation
+    """
+    # breakpoint()
     exts = ["csv", "jsonl"]
     ext_to_use = None
     for ext in exts:
@@ -230,6 +236,7 @@ def llm_munge_data(params, local):
         params.text_column = "autotrain_text"
         params.rejected_text_column = "autotrain_rejected_text"
         params.prompt_text_column = "autotrain_prompt"
+    # breakpoint()
     return params
 
 
@@ -344,14 +351,18 @@ def img_clf_munge_data(params, local):
     else:
         valid_data_path = None
     if os.path.isdir(train_data_path) or os.path.isdir(valid_data_path):
-        raise Exception("Image classification is not yet supported for local datasets using the CLI. Please use UI.")
+        raise Exception(
+            "Image classification is not yet supported for local datasets using the CLI. Please use UI."
+        )
     return params
 
 
 def dreambooth_munge_data(params, local):
     # check if params.image_path is a directory
     if os.path.isdir(params.image_path):
-        training_data = [os.path.join(params.image_path, f) for f in os.listdir(params.image_path)]
+        training_data = [
+            os.path.join(params.image_path, f) for f in os.listdir(params.image_path)
+        ]
         dset = AutoTrainDreamboothDataset(
             concept_images=training_data,
             concept_name=params.prompt,

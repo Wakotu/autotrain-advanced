@@ -15,6 +15,10 @@ from autotrain.trainers.token_classification.params import TokenClassificationPa
 
 
 def launch_command(params):
+    """
+    key components: env(python dependency), script, args.
+    which model, data_path handled by llm_munge_data
+    """
     params.project_name = shlex.split(params.project_name)[0]
     cuda_available = torch.cuda.is_available()
     mps_available = torch.backends.mps.is_available()
@@ -26,7 +30,9 @@ def launch_command(params):
         num_gpus = 0
     if isinstance(params, LLMTrainingParams):
         if num_gpus == 0:
-            logger.warning("No GPU found. Forcing training on CPU. This will be super slow!")
+            logger.warning(
+                "No GPU found. Forcing training on CPU. This will be super slow!"
+            )
             cmd = [
                 "accelerate",
                 "launch",
@@ -258,7 +264,9 @@ def launch_command(params):
         )
     elif isinstance(params, Seq2SeqParams):
         if num_gpus == 0:
-            logger.warning("No GPU found. Forcing training on CPU. This will be super slow!")
+            logger.warning(
+                "No GPU found. Forcing training on CPU. This will be super slow!"
+            )
             cmd = [
                 "accelerate",
                 "launch",

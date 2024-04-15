@@ -25,7 +25,10 @@ from trl import DPOTrainer, RewardConfig, RewardTrainer, SFTTrainer
 
 from autotrain import logger
 from autotrain.trainers.clm import utils
-from autotrain.trainers.clm.callbacks import LoadBestPeftModelCallback, SavePeftModelCallback
+from autotrain.trainers.clm.callbacks import (
+    LoadBestPeftModelCallback,
+    SavePeftModelCallback,
+)
 from autotrain.trainers.clm.params import LLMTrainingParams
 from autotrain.trainers.common import (
     LossLoggingCallback,
@@ -72,6 +75,8 @@ def parse_args():
 
 
 def process_input_data(config):
+    # fields of config used: data_path, trainer, project_name, valid_split
+    # breakpoint()
     if config.data_path == f"{config.project_name}/autotrain-data":
         logger.info("loading dataset from disk")
         train_data = load_from_disk(config.data_path)[config.train_split]
@@ -83,12 +88,23 @@ def process_input_data(config):
         )
     # rename columns for reward trainer
     if config.trainer in ("dpo", "reward"):
-        if not (config.text_column == "chosen" and config.text_column in train_data.column_names):
+        if not (
+            config.text_column == "chosen"
+            and config.text_column in train_data.column_names
+        ):
             train_data = train_data.rename_column(config.text_column, "chosen")
-        if not (config.rejected_text_column == "rejected" and config.rejected_text_column in train_data.column_names):
-            train_data = train_data.rename_column(config.rejected_text_column, "rejected")
+        if not (
+            config.rejected_text_column == "rejected"
+            and config.rejected_text_column in train_data.column_names
+        ):
+            train_data = train_data.rename_column(
+                config.rejected_text_column, "rejected"
+            )
     if config.trainer == "dpo":
-        if not (config.prompt_text_column == "prompt" and config.prompt_text_column in train_data.column_names):
+        if not (
+            config.prompt_text_column == "prompt"
+            and config.prompt_text_column in train_data.column_names
+        ):
             train_data = train_data.rename_column(config.prompt_text_column, "prompt")
 
     if config.valid_split is not None:
@@ -102,15 +118,26 @@ def process_input_data(config):
             )
 
         if config.trainer in ("dpo", "reward"):
-            if not (config.text_column == "chosen" and config.text_column in valid_data.column_names):
+            if not (
+                config.text_column == "chosen"
+                and config.text_column in valid_data.column_names
+            ):
                 valid_data = valid_data.rename_column(config.text_column, "chosen")
             if not (
-                config.rejected_text_column == "rejected" and config.rejected_text_column in valid_data.column_names
+                config.rejected_text_column == "rejected"
+                and config.rejected_text_column in valid_data.column_names
             ):
-                valid_data = valid_data.rename_column(config.rejected_text_column, "rejected")
+                valid_data = valid_data.rename_column(
+                    config.rejected_text_column, "rejected"
+                )
         if config.trainer == "dpo":
-            if not (config.prompt_text_column == "prompt" and config.prompt_text_column in valid_data.column_names):
-                valid_data = valid_data.rename_column(config.prompt_text_column, "prompt")
+            if not (
+                config.prompt_text_column == "prompt"
+                and config.prompt_text_column in valid_data.column_names
+            ):
+                valid_data = valid_data.rename_column(
+                    config.prompt_text_column, "prompt"
+                )
     else:
         valid_data = None
 
@@ -122,13 +149,16 @@ def process_input_data(config):
 
 @monitor
 def train(config):
+    # breakpoint()
     if isinstance(config, dict):
         config = LLMTrainingParams(**config)
 
     if config.padding not in ("left", "right"):
         config.padding = None
 
-    is_deepspeed_enabled = os.environ.get("ACCELERATE_USE_DEEPSPEED", "False").lower() == "true"
+    is_deepspeed_enabled = (
+        os.environ.get("ACCELERATE_USE_DEEPSPEED", "False").lower() == "true"
+    )
 
     if config.repo_id is None and config.username is not None:
         config.repo_id = f"{config.username}/{config.project_name}"
@@ -156,7 +186,9 @@ def train(config):
         )
         tokenizer.chat_template = chat_template
     else:
-        tokenizer = AutoTokenizer.from_pretrained(config.model, token=config.token, trust_remote_code=True)
+        tokenizer = AutoTokenizer.from_pretrained(
+            config.model, token=config.token, trust_remote_code=True
+        )
         if tokenizer.chat_template is None:
             tokenizer.chat_template = utils.DEFAULT_CHAT_TEMPLATE
 
@@ -225,7 +257,9 @@ def train(config):
         per_device_eval_batch_size=config.batch_size,
         learning_rate=config.lr,
         num_train_epochs=config.epochs,
-        evaluation_strategy=config.evaluation_strategy if config.valid_split is not None else "no",
+        evaluation_strategy=(
+            config.evaluation_strategy if config.valid_split is not None else "no"
+        ),
         logging_steps=logging_steps,
         save_total_limit=config.save_total_limit,
         save_strategy=config.save_strategy,
@@ -517,9 +551,13 @@ def train(config):
                 max_length, max_prompt_length = config.block_size
                 max_target_length = None
             else:
-                raise ValueError(f"block_size must be a list of length 2 or 3, got {config.block_size}")
+                raise ValueError(
+                    f"block_size must be a list of length 2 or 3, got {config.block_size}"
+                )
         else:
-            raise ValueError(f"block_size must be an int or a list, got {config.block_size}")
+            raise ValueError(
+                f"block_size must be an int or a list, got {config.block_size}"
+            )
         trainer = DPOTrainer(
             **trainer_args,
             ref_model=model_ref,
@@ -543,7 +581,10 @@ def train(config):
             module = module.to(torch.float32)
         if any(x in name for x in ["lm_head", "embed_tokens", "wte", "wpe"]):
             if hasattr(module, "weight"):
-                if config.mixed_precision == "bf16" and module.weight.dtype == torch.float32:
+                if (
+                    config.mixed_precision == "bf16"
+                    and module.weight.dtype == torch.float32
+                ):
                     module = module.to(torch.bfloat16)
 
     trainer.remove_callback(PrinterCallback)
@@ -573,7 +614,9 @@ def train(config):
                     os.remove(f"{config.project_name}/{file}")
         except Exception as e:
             logger.warning(f"Failed to merge adapter weights: {e}")
-            logger.warning("Skipping adapter merge. Only adapter weights will be saved.")
+            logger.warning(
+                "Skipping adapter merge. Only adapter weights will be saved."
+            )
 
     if config.push_to_hub:
         if PartialState().process_index == 0:
@@ -582,7 +625,9 @@ def train(config):
             logger.info("Pushing model to hub...")
             save_training_params(config)
             api = HfApi(token=config.token)
-            api.create_repo(repo_id=config.repo_id, repo_type="model", private=True, exist_ok=True)
+            api.create_repo(
+                repo_id=config.repo_id, repo_type="model", private=True, exist_ok=True
+            )
             api.upload_folder(
                 folder_path=config.project_name,
                 repo_id=config.repo_id,

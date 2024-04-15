@@ -12,7 +12,11 @@ from nvitop import Device
 
 from autotrain import __version__, app_utils, logger
 from autotrain.app_params import AppParams
-from autotrain.dataset import AutoTrainDataset, AutoTrainDreamboothDataset, AutoTrainImageClassificationDataset
+from autotrain.dataset import (
+    AutoTrainDataset,
+    AutoTrainDreamboothDataset,
+    AutoTrainImageClassificationDataset,
+)
 from autotrain.db import AutoTrainDB
 from autotrain.help import get_app_help
 from autotrain.models import fetch_models
@@ -253,7 +257,9 @@ async def fetch_params(task: str, param_type: str):
                         "lora_dropout",
                     ]
                 )
-            task_params = {k: v for k, v in task_params.items() if k not in more_hidden_params}
+            task_params = {
+                k: v for k, v in task_params.items() if k not in more_hidden_params
+            }
         if task == "text-classification" and param_type == "basic":
             more_hidden_params = [
                 "warmup_ratio",
@@ -266,7 +272,9 @@ async def fetch_params(task: str, param_type: str):
                 "save_strategy",
                 "evaluation_strategy",
             ]
-            task_params = {k: v for k, v in task_params.items() if k not in more_hidden_params}
+            task_params = {
+                k: v for k, v in task_params.items() if k not in more_hidden_params
+            }
         if task == "image-classification" and param_type == "basic":
             more_hidden_params = [
                 "warmup_ratio",
@@ -279,7 +287,9 @@ async def fetch_params(task: str, param_type: str):
                 "save_strategy",
                 "evaluation_strategy",
             ]
-            task_params = {k: v for k, v in task_params.items() if k not in more_hidden_params}
+            task_params = {
+                k: v for k, v in task_params.items() if k not in more_hidden_params
+            }
         if task == "seq2seq" and param_type == "basic":
             more_hidden_params = [
                 "warmup_ratio",
@@ -297,7 +307,9 @@ async def fetch_params(task: str, param_type: str):
                 "lora_dropout",
                 "target_modules",
             ]
-            task_params = {k: v for k, v in task_params.items() if k not in more_hidden_params}
+            task_params = {
+                k: v for k, v in task_params.items() if k not in more_hidden_params
+            }
         if task == "token-classification" and param_type == "basic":
             more_hidden_params = [
                 "warmup_ratio",
@@ -310,7 +322,9 @@ async def fetch_params(task: str, param_type: str):
                 "save_strategy",
                 "evaluation_strategy",
             ]
-            task_params = {k: v for k, v in task_params.items() if k not in more_hidden_params}
+            task_params = {
+                k: v for k, v in task_params.items() if k not in more_hidden_params
+            }
         if task == "dreambooth":
             more_hidden_params = [
                 "epochs",
@@ -339,7 +353,9 @@ async def fetch_params(task: str, param_type: str):
                         "text_encoder_use_attention_mask",
                     ]
                 )
-            task_params = {k: v for k, v in task_params.items() if k not in more_hidden_params}
+            task_params = {
+                k: v for k, v in task_params.items() if k not in more_hidden_params
+            }
         return task_params
     return {"error": "Task not found"}
 
@@ -437,7 +453,8 @@ async def handle_form(
         running_jobs = app_utils.get_running_jobs(DB)
         if running_jobs:
             raise HTTPException(
-                status_code=409, detail="Another job is already running. Please wait for it to finish."
+                status_code=409,
+                detail="Another job is already running. Please wait for it to finish.",
             )
 
     if HF_TOKEN is None:
@@ -454,28 +471,45 @@ async def handle_form(
     params = json.loads(params)
     column_mapping = json.loads(column_mapping)
 
-    training_files = [f.file for f in data_files_training if f.filename != ""] if data_files_training else []
-    validation_files = [f.file for f in data_files_valid if f.filename != ""] if data_files_valid else []
+    training_files = (
+        [f.file for f in data_files_training if f.filename != ""]
+        if data_files_training
+        else []
+    )
+    validation_files = (
+        [f.file for f in data_files_valid if f.filename != ""]
+        if data_files_valid
+        else []
+    )
 
     if len(training_files) > 0 and len(hub_dataset) > 0:
         raise HTTPException(
-            status_code=400, detail="Please either upload a dataset or choose a dataset from the Hugging Face Hub."
+            status_code=400,
+            detail="Please either upload a dataset or choose a dataset from the Hugging Face Hub.",
         )
 
     if len(training_files) == 0 and len(hub_dataset) == 0:
         raise HTTPException(
-            status_code=400, detail="Please upload a dataset or choose a dataset from the Hugging Face Hub."
+            status_code=400,
+            detail="Please upload a dataset or choose a dataset from the Hugging Face Hub.",
         )
 
     if len(hub_dataset) > 0 and task == "dreambooth":
-        raise HTTPException(status_code=400, detail="Dreambooth does not support Hugging Face Hub datasets.")
+        raise HTTPException(
+            status_code=400,
+            detail="Dreambooth does not support Hugging Face Hub datasets.",
+        )
 
     if len(hub_dataset) > 0:
         if not train_split:
-            raise HTTPException(status_code=400, detail="Please enter a training split.")
+            raise HTTPException(
+                status_code=400, detail="Please enter a training split."
+            )
 
     file_extension = os.path.splitext(data_files_training[0].filename)[1]
-    file_extension = file_extension[1:] if file_extension.startswith(".") else file_extension
+    file_extension = (
+        file_extension[1:] if file_extension.startswith(".") else file_extension
+    )
 
     if len(hub_dataset) == 0:
         if task == "image-classification":
@@ -562,7 +596,9 @@ async def handle_form(
         DB.add_job(job_id)
         monitor_url = "Monitor your job locally / in logs"
     elif hardware.startswith("EP"):
-        monitor_url = f"https://ui.endpoints.huggingface.co/{autotrain_user}/endpoints/{job_id}"
+        monitor_url = (
+            f"https://ui.endpoints.huggingface.co/{autotrain_user}/endpoints/{job_id}"
+        )
     else:
         monitor_url = f"https://hf.co/spaces/{job_id}"
 
