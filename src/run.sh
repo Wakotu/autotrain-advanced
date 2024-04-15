@@ -33,7 +33,7 @@ python main.py llm \
 	--lora-alpha ${LORA_ALPHA} \
 	--lora-dropout ${LORA_DROPOUT} \
 	--weight-decay ${WEIGHT_DECAY} \
-	--gradient-accumulation ${GRADIENT_ACCUMULATION}
+	--gradient-accumulation ${GRADIENT_ACCUMULATION} \
 # --mp fp16 \
 #
   --use-peft \
