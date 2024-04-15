@@ -36,7 +36,7 @@ python main.py llm \
 	--gradient-accumulation ${GRADIENT_ACCUMULATION}
 # --mp fp16 \
 #
-$([[ "$USE_PEFT" == "True" ]] && echo "--use-peft") \
+  --use-peft \
 	--quantization int4 \
 	--backend local-cli \
 	--username Wakotu
