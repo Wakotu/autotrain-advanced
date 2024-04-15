@@ -77,6 +77,7 @@ def parse_args():
 def process_input_data(config):
     # fields of config used: data_path, trainer, project_name, valid_split
     # breakpoint()
+    # used to load previously saved dataset(in rerun)
     if config.data_path == f"{config.project_name}/autotrain-data":
         logger.info("loading dataset from disk")
         train_data = load_from_disk(config.data_path)[config.train_split]

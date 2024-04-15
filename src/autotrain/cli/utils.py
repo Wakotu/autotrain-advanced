@@ -208,6 +208,10 @@ def llm_munge_data(params, local):
             ext_to_use = ext
             break
 
+    """
+    let alone valid_path, construct train_data_path and judge if it exists.
+    dir or file? 
+    """
     train_data_path = f"{params.data_path}/{params.train_split}.{ext_to_use}"
     if params.valid_split is not None:
         valid_data_path = f"{params.data_path}/{params.valid_split}.{ext_to_use}"
