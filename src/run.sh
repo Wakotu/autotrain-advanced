@@ -10,9 +10,6 @@ TRAINER=sft
 WARMUP_RATIO=0.1
 WEIGHT_DECAY=0.01
 GRADIENT_ACCUMULATION=4
-USE_FP16=True
-USE_PEFT=True
-USE_INT4=True
 LORA_R=16
 LORA_ALPHA=32
 LORA_DROPOUT=0.045
@@ -34,7 +31,7 @@ python main.py llm \
 	--lora-dropout ${LORA_DROPOUT} \
 	--weight-decay ${WEIGHT_DECAY} \
 	--gradient-accumulation ${GRADIENT_ACCUMULATION} \
-  --use-peft \
+	--use-peft \
 	--quantization int4 \
 	--backend local-cli \
 	--username Wakotu
