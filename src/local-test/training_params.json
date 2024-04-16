@@ -29,10 +29,10 @@
     "max_grad_norm": 1.0,
     "seed": 42,
     "chat_template": null,
-    "quantization": null,
+    "quantization": "int4",
     "target_modules": null,
     "merge_adapter": false,
-    "peft": false,
+    "peft": true,
     "lora_r": 16,
     "lora_alpha": 32,
     "lora_dropout": 0.045,
@@ -42,7 +42,7 @@
     "text_column": "text",
     "rejected_text_column": "rejected",
     "push_to_hub": false,
-    "repo_id": null,
-    "username": null,
+    "repo_id": "Wakotu/local-test",
+    "username": "Wakotu",
     "token": null
 }

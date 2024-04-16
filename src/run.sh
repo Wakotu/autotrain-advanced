@@ -34,8 +34,6 @@ python main.py llm \
 	--lora-dropout ${LORA_DROPOUT} \
 	--weight-decay ${WEIGHT_DECAY} \
 	--gradient-accumulation ${GRADIENT_ACCUMULATION} \
-# --mp fp16 \
-#
   --use-peft \
 	--quantization int4 \
 	--backend local-cli \
